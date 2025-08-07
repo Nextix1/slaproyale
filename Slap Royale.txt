@@ -130,8 +130,9 @@ local Player = GUI:Tab{
 	Icon = "rbxassetid://7743875962"
 }
 
-User = game.Players.LocalPlayer
+local User = game.Players.LocalPlayer
 
+-- Ayarlar Slideri
 Combat:Slider{
 	Name = "Slap Aura",
 	Default = 10,
@@ -140,42 +141,61 @@ Combat:Slider{
 	Description = "Slaps every player near you. This is experimental, it may kick you.",
 	Callback = function(Value) 
 		getgenv().Range = Value
-		if getgenv().Range == 0 then
-			for i,v in pairs(User.Character:GetChildren()) do
-				if v.ClassName == "Tool" and v:FindFirstChild("Glove") then
-					v.Glove.CanTouch = true
-                   		end
+
+		if Value == 0 then
+			local player = game.Players.LocalPlayer
+			local function enableTouch()
+				for _, tool in pairs(player.Character:GetChildren()) do
+					if tool:IsA("Tool") and tool:FindFirstChild("Glove") then
+						tool.Glove.CanTouch = true
+					end
+				end
+				for _, tool in pairs(player.Backpack:GetChildren()) do
+					if tool:IsA("Tool") and tool:FindFirstChild("Glove") then
+						tool.Glove.CanTouch = true
+					end
+				end
 			end
-			for i,v in pairs(User.Backpack:GetChildren()) do
-				if v.ClassName == "Tool" and v:FindFirstChild("Glove") then
-					v.Glove.CanTouch = true
-                   		end
-			end
+			enableTouch()
 		end
 	end
 }
 
+-- Slap Aura kodu
 if not getgenv().slapAura then
+	getgenv().slapAura = true
+	getgenv().Range = 0
+
 	task.spawn(function()
-		getgenv().slapAura = true
-		getgenv().Range = 0
+		
+
 		while task.wait() do
 			if getgenv().Range > 0 then
-				for i,v in pairs(User.Character:GetChildren()) do
-					if v.ClassName == "Tool" and v:FindFirstChild("Glove") then
-						v.Glove.CanTouch = false
-                   			end
+				-- Disable glove touch
+				for _, tool in pairs(player.Character:GetChildren()) do
+					if tool:IsA("Tool") and tool:FindFirstChild("Glove") then
+						tool.Glove.CanTouch = false
+					end
 				end
-				for i,v in pairs(game.Players:GetChildren()) do
-					if v ~= User and User.Character:FindFirstChild("HumanoidRootPart") and v.Character then
-						if v.Character:FindFirstChild("HumanoidRootPart") and v.Character:FindFirstChild("Ragdolled") and not v.Character:FindFirstChild("Dead") and v.Character:WaitForChild("inMatch").Value == true and v.Character.Ragdolled.Value == false then
-							Magnitude = (User.Character.HumanoidRootPart.Position - v.Character.HumanoidRootPart.Position).Magnitude
-                        				if Magnitude <= getgenv().Range then
-								game.ReplicatedStorage.Events.Slap:FireServer(v.Character.HumanoidRootPart, true)
-								for i,g in pairs(User.Character:GetChildren()) do
-									if g.ClassName == "Tool" and g:FindFirstChild("Glove") then
-										g:Activate()
-                   							end
+
+				for _, other in pairs(game.Players:GetPlayers()) do
+					if other ~= player and other.Character and other.Character:FindFirstChild("HumanoidRootPart") then
+						local root = other.Character.HumanoidRootPart
+						local myRoot = player.Character:FindFirstChild("HumanoidRootPart")
+
+						if myRoot and other.Character:FindFirstChild("inMatch") and other.Character:FindFirstChild("Ragdolled") and not other.Character:FindFirstChild("Dead") then
+							if other.Character.inMatch.Value == true and other.Character.Ragdolled.Value == false then
+								local distance = (myRoot.Position - root.Position).Magnitude
+								if distance <= getgenv().Range then
+									-- Slap gönder
+									game.ReplicatedStorage.Events.Slap:FireServer(root, true)
+
+									-- Elindeki glove'u kullan
+									for _, tool in pairs(player.Character:GetChildren()) do
+										if tool:IsA("Tool") and tool:FindFirstChild("Glove") then
+											tool:Activate()
+										end
+									end
 								end
 							end
 						end
@@ -185,45 +205,6 @@ if not getgenv().slapAura then
 		end
 	end)
 end
-
-Combat:Toggle{
-	Name = "Stat ESP",
-	StartingState = true,
-	Description = "Shows the glove players are using, and their power above their heads.",
-	Callback = function(Value) 
-		getgenv().statESP = Value
-		for i, v in pairs(game.Players:GetChildren()) do
-			if v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("StatEsp") then
-				v.Character.Head.StatEsp:Destroy()
-    			end
-		end
-		while getgenv().statESP do
-			for i, v in pairs(game.Players:GetChildren()) do
-    				if v ~= User and v.Character and v.Character:FindFirstChild("Head") and not v.Character:FindFirstChild("Dead") and not v.Character.Head:FindFirstChild("StatEsp") then
-					StatEsp = Instance.new("BillboardGui", v.Character.Head)
-					StatEsp.Name = "StatEsp"
-					StatEsp.Size = UDim2.new(0, 100, 0, 150)
-					StatEsp.AlwaysOnTop = true
-					StatEsp.StudsOffset = Vector3.new(0, -1, 0)
-					StatEspText = Instance.new("TextLabel", StatEsp)
-					StatEspText.BackgroundTransparency = 1
-					StatEspText.Size = UDim2.new(0, 100, 0, 100)
-					StatEspText.TextSize = 20
-					StatEspText.Font = Enum.Font.SourceSansSemibold
-					StatEspText.TextColor3 = Color3.new(1, 1, 1)
-					StatEspText.TextStrokeTransparency = 0
-					StatEspText.TextYAlignment = Enum.TextYAlignment.Center
-					StatEspText.Text = "Glove: " .. v.Glove.Value .. " | Power: " .. v.Character.Power.Value
-				elseif v ~= User and v.Character and v.Character:FindFirstChild("Head") and v.Character:FindFirstChild("Dead") and v.Character.Head:FindFirstChild("StatEsp") then
-					v.Character.Head.StatEsp:Destroy()
-				elseif v ~= User and v.Character and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("StatEsp") and v.Character.Head.StatEsp.TextLabel.Text ~= "Glove: " .. v.Glove.Value .. " | Power: " .. v.Character.Power.Value then
-					v.Character.Head.StatEsp.TextLabel.Text = "Glove: " .. v.Glove.Value .. " | Power: " .. v.Character.Power.Value
-				end
-			end
-			wait()
-		end
-	end
-}
 
 Protection:Toggle{
 	Name = "Anti Acid",
