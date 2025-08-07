@@ -134,7 +134,7 @@ User = game.Players.LocalPlayer
 
 Combat:Slider{
 	Name = "Slap Aura",
-	Default = 8,
+	Default = 10,
 	Min = 0,
 	Max = 20,
 	Description = "Slaps every player near you. This is experimental, it may kick you.",
