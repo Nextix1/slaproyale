@@ -138,8 +138,8 @@ Combat:Slider{
 	Min = 0,
 	Max = 20,
 	Description = "Slaps every player near you. This is experimental, it may kick you.",
-	Callback = function(Value) 
-		getgenv().Range = Value
+	Callback = function(10) 
+		getgenv().Range = 10
 		if getgenv().Range == 0 then
 			for i,v in pairs(User.Character:GetChildren()) do
 				if v.ClassName == "Tool" and v:FindFirstChild("Glove") then
