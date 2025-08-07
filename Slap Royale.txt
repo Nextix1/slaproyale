@@ -134,7 +134,7 @@ User = game.Players.LocalPlayer
 
 Combat:Slider{
 	Name = "Slap Aura",
-	Default = 6,
+	Default = 8,
 	Min = 0,
 	Max = 20,
 	Description = "Slaps every player near you. This is experimental, it may kick you.",
@@ -454,7 +454,7 @@ Misc:Button{
 Player:Slider{
 	Name = "Walkspeed",
 	Description = "Changes how fast you walk.",
-	Default = 24,
+	Default = 20,
 	Min = 20,
 	Max = 1000,
 	Callback = function(Value) 
@@ -465,7 +465,7 @@ Player:Slider{
 
 Player:Toggle{
 	Name = "Keep Walkspeed",
-	StartingState = true,
+	StartingState = false,
 	Description = "Doesn't let your walkspeed get changed.",
 	Callback = function(Value) 
 		getgenv().keepWalkspeed = Value
@@ -481,7 +481,7 @@ Player:Toggle{
 Player:Slider{
 	Name = "Jumppower",
 	Description = "Changes how high you jump.",
-	Default = 63,
+	Default = 50,
 	Min = 50,
 	Max = 1000,
 	Callback = function(Value) 
@@ -492,7 +492,7 @@ Player:Slider{
 
 Player:Toggle{
 	Name = "Keep Jumppower",
-	StartingState = true,
+	StartingState = false,
 	Description = "Doesn't let your jumppower get changed.",
 	Callback = function(Value) 
 		getgenv().keepJumppower = Value
